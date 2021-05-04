@@ -7,7 +7,7 @@ apply plugin: 'application'
 
 // This is the class with the main to run when the application starts.
 
-mainClassName = 'munitz.geojson.GeoJsonApplication'
+mainClassName = 'munitz.openweathermap.OpenWeatherMapApplication'
 
 repositories {
     mavenCentral()
