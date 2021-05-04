@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Text?>
+<?import java.util.ArrayList?>
+
+
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller = "munitz.openweathermap.OpenWeatherMapController"
+          prefHeight="400.0" prefWidth="600.0"
+          stylesheets="@openweathermap_application.css">
+
+    <Label fx:id="locationLabel" text="Choose city:"
+           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <TextField fx:id="locationTextField"
+               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+    <ChoiceBox fx:id = "degreeUnitChoiceBox"
+               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <Button fx:id="getCurrentWeatherButton" text='Enter' onAction="#getWeather"
+            GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+
+    <Label fx:id="currentWeatherLabel"
+           GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="3"/>
+    <Text fx:id = "currentWeatherText"
+               GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+    <ImageView fx:id = "weatherIcon" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+
+    <Text fx:id="date1Text" styleClass="weather" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+    <Text fx:id="date2Text" styleClass="weather" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+    <Text fx:id="date3Text" styleClass="weather" GridPane.columnIndex="2" GridPane.rowIndex="10"/>
+    <Text fx:id="date4Text" styleClass="weather" GridPane.columnIndex="3" GridPane.rowIndex="10"/>
+    <Text fx:id="date5Text" styleClass="weather" GridPane.columnIndex="4" GridPane.rowIndex="10"/>
+
+
+
+    <Text fx:id ="temp1Text" styleClass="weather" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+    <Text fx:id ="temp2Text" styleClass="weather" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+    <Text fx:id ="temp3Text" styleClass="weather" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+    <Text fx:id ="temp4Text" styleClass="weather" GridPane.columnIndex="3" GridPane.rowIndex="11" />
+    <Text fx:id ="temp5Text" styleClass="weather" GridPane.columnIndex="4" GridPane.rowIndex="11" />
+
+
+    <ImageView fx:id = "weatherIcon1" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
+    <ImageView fx:id = "weatherIcon2" GridPane.columnIndex="1" GridPane.rowIndex="12"/>
+    <ImageView fx:id = "weatherIcon3" GridPane.columnIndex="2" GridPane.rowIndex="12"/>
+    <ImageView fx:id = "weatherIcon4" GridPane.columnIndex="3" GridPane.rowIndex="12"/>
+    <ImageView fx:id = "weatherIcon5" GridPane.columnIndex="4" GridPane.rowIndex="12"/>
+
+
+
+    <fx:define>
+        <ArrayList fx:id="dateTextsArray">
+            <fx:reference source="date1Text"/>
+            <fx:reference source="date2Text"/>
+            <fx:reference source="date3Text"/>
+            <fx:reference source="date4Text"/>
+            <fx:reference source="date5Text"/>
+        </ArrayList>
+
+        <ArrayList fx:id="tempTextsArray">
+            <fx:reference source="temp1Text"/>
+            <fx:reference source="temp2Text"/>
+            <fx:reference source="temp3Text"/>
+            <fx:reference source="temp4Text"/>
+            <fx:reference source="temp5Text"/>
+        </ArrayList>
+
+        <ArrayList fx:id="weatherIconsArray">
+            <fx:reference source="weatherIcon1"/>
+            <fx:reference source="weatherIcon2"/>
+            <fx:reference source="weatherIcon3"/>
+            <fx:reference source="weatherIcon4"/>
+            <fx:reference source="weatherIcon5"/>
+        </ArrayList>
+    </fx:define>
+
+</GridPane>
