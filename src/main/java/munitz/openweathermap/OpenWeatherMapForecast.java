@@ -42,7 +42,7 @@ public class OpenWeatherMapForecast {
     /**
      *
      * @param day amount of days past today
-     *            to retrieve midday forecasts of
+     *            to retrieve midday forecast of
      * @return forecast matching 11 AM of specified day
      *          or null if day is out of range
      */

@@ -1,6 +1,6 @@
 package munitz.openweathermap;
 
-import javafx.collections.FXCollections;
+import io.reactivex.rxjava3.core.Single;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -8,12 +8,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import munitz.openweathermap.OpenWeatherMapForecast.HourlyForecast;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class OpenWeatherMapControllerTest {
@@ -25,8 +27,8 @@ public class OpenWeatherMapControllerTest {
     private OpenWeatherMapFeed feed;
     private Text currentWeatherText;
     private ImageView weatherIcon;
-    private ArrayList<Text> dateTextsArray;
-    private ArrayList<Text> tempTextsArray;
+    private ArrayList<Text> dateTextsArray, tempTextsArray;
+   // private ArrayList<Text> tempTextsArray;
     private ArrayList<ImageView> weatherIconsArray;
     private HourlyForecast hourlyForecast;
     private Label currentWeatherLabel;
@@ -40,24 +42,18 @@ public class OpenWeatherMapControllerTest {
     }
 
     @Test
-    //does not work
     public void initialize (){
+        //missing factory/service verification?
         //given
         givenOpenWeatherMapController();
-        doReturn(service).when(factory).newInstance();
-        doNothing().when(degreeUnitChoiceBox).setItems(FXCollections.observableArrayList("Celsius", "Fahrenheit"));
+
         //when
         controller.initialize();
-        //then
-        verify(factory).newInstance();
-        //verify(controller.degreeUnitChoiceBox).getItems()
-                //.equals(FXCollections.observableArrayList("Celsius", "Fahrenheit"));
-        verify(controller.degreeUnitChoiceBox).getValue().equals("Fahrenheit");
-        Assert.assertEquals(service,factory.newInstance());
-        Assert.assertEquals("Fahrenheit", degreeUnitChoiceBox.getValue());
+
+        //verify
+        verify(controller.degreeUnitChoiceBox).setValue("Fahrenheit");
 
     }
-
 
     @Test
     public void getParameters() {
@@ -70,47 +66,49 @@ public class OpenWeatherMapControllerTest {
         controller.getParameters();
 
         //then
-        Assert.assertEquals("Tel Aviv", controller.location);
-        Assert.assertEquals("imperial", controller.unit);
+        assertEquals("Tel Aviv", controller.location);
+        assertEquals("imperial", controller.unit);
     }
 
     @Test
-    //does not work
     public void getWeather(){
         //given
         givenOpenWeatherMapController();
-        controller.location = "Tel Aviv";
+        doReturn("Tel Aviv").when(locationTextField).getText();
+        doReturn("Fahrenheit").when(degreeUnitChoiceBox).getValue();
+        doReturn(Single.never()).when(service).getCurrentWeather("Tel Aviv", "imperial");
+        doReturn(Single.never()).when(service).getWeatherForecast("Tel Aviv", "imperial");
 
         //when
         controller.getWeather();
 
         //then
-        verify(controller, times(1)).getParameters();
+        //verify(controller).getParameters(); //controller is not a mock. how to verify getParameters() is called?
         verify(currentWeatherLabel).setText("Current Weather in Tel Aviv: ");
+        verify(service).getCurrentWeather("Tel Aviv", "imperial");
+        verify(service).getWeatherForecast("Tel Aviv", "imperial");
     }
-
 
     @Test
     public void onOpenWeatherMapFeed(){
         //given
         givenOpenWeatherMapController();
-        doNothing().when(currentWeatherText).setText((feed.main.temp) +"\u00B0");
-        //doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(feed.weather.get(0).getIconUrl());
-        //Image image = mock(Image.class);
-        //doNothing().when(weatherIcon).setImage(any(Image.class));
-
+        //doReturn("90.0").when(feed.main.temp);
+        doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(feed.weather.get(0)).getIconUrl();
 
         //when
         controller.onOpenWeatherMapFeed(feed);
 
         //then
-        verify(currentWeatherText).setText(String.valueOf(feed.main.temp));
-       // verify(weatherIcon).setImage(any(Image.class));
+        verify(currentWeatherText).setText("90.0\u00B0");
+        verify(weatherIcon).setImage(any(Image.class));
+        //any image?
+        //Image("http://openweathermap.org/img/wn/01n@2x.png"));
 
     }
 
-
     @Test
+    //how to test?
     public void cleanDate(){
         //given
         givenOpenWeatherMapController();
@@ -122,31 +120,40 @@ public class OpenWeatherMapControllerTest {
 
         //then
         verify(String.valueOf(hourlyForecast.getDate()).split(""));
-
-
     }
+    
     @Test
     public void onOpenWeatherMapForecast(){
         //given
         givenOpenWeatherMapController();
-        doReturn(hourlyForecast).when(forecast).getForecastFor(anyInt());
+        doReturn(hourlyForecast).when(forecast).getForecastFor(1);
+        //doReturn("May 4 ").when(controller.cleanDate(hourlyForecast));
+        //doReturn("90").when(hourlyForecast.main.temp);
+        //doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(hourlyForecast.weather.get(0).getIconUrl());
 
+
+        //when
+        controller.onOpenWeatherMapForecast(forecast);
+
+        //verify
+        verify(dateTextsArray).get(0).setText("May 4");
+        verify(tempTextsArray).get(0).setText("90.0\u00B0");
+        verify(weatherIconsArray).get(0).setImage(any(Image.class));
 
     }
 
     @Test
     public void onError(){
-
-
     }
 
 
 
     @Test
-    public void givenOpenWeatherMapController(){
-        controller = new OpenWeatherMapController();
+    //redo
+    public void givenOpenWeatherMapController() {
         service = mock(OpenWeatherMapService.class);
-        controller.service = service;
+        controller = new OpenWeatherMapController(service);
+
         factory = mock(OpenWeatherMapServiceFactory.class);
         controller.factory = factory;
         degreeUnitChoiceBox = mock(ChoiceBox.class);
@@ -169,6 +176,10 @@ public class OpenWeatherMapControllerTest {
         hourlyForecast = mock(HourlyForecast.class);
         feed = mock(OpenWeatherMapFeed.class);
         feed.main = mock(OpenWeatherMapFeed.Main.class);
-        feed.main.temp = 90;
+        feed.main.temp = 90.0;
+        //hourlyForecast.main.temp= 90.0;
+        hourlyForecast.weather = Arrays.asList(
+               mock(OpenWeatherMapForecast.HourlyForecast.Weather.class));
+
     }
 }

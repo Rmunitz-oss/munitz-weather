@@ -39,6 +39,11 @@ public class OpenWeatherMapController {
     OpenWeatherMapServiceFactory factory;
     OpenWeatherMapService service;
 
+    public OpenWeatherMapController(OpenWeatherMapService service){
+        this.service = service;
+    }
+
+
     @FXML
     public void initialize(){
         factory = new OpenWeatherMapServiceFactory();
@@ -51,7 +56,7 @@ public class OpenWeatherMapController {
 
     public void getParameters(){
         location = locationTextField.getText();
-        unit = (degreeUnitChoiceBox.getValue() =="Fahrenheit")? "imperial" : "metric";
+        unit = (degreeUnitChoiceBox.getValue().equals("Fahrenheit"))? "imperial" : "metric";
     }
 
     public void getWeather(){
@@ -69,10 +74,7 @@ public class OpenWeatherMapController {
 
     public void onOpenWeatherMapFeed(OpenWeatherMapFeed feed){
         currentWeatherText.setText((feed.main.temp) +"\u00B0");
-        iconURL = feed.weather.get(0).getIconUrl();
-        Image image = new Image(iconURL);
-        weatherIcon.setImage(image);
-
+        weatherIcon.setImage(new Image(feed.weather.get(0).getIconUrl()));
     }
 
     public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast){
@@ -94,7 +96,8 @@ public class OpenWeatherMapController {
 
 
     public void onError(Throwable throwable){
-        //not the proper way to do it
+
+        //throwable.getStackTrace();
         System.out.println("Error");
     }
 }

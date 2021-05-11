@@ -2,6 +2,7 @@ package munitz.openweathermap;
 
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface OpenWeatherMapService {
@@ -17,6 +18,9 @@ public interface OpenWeatherMapService {
             @Query("q") String location,
             @Query("units") String units
     );
+
+
+
 
 
 }

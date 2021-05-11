@@ -9,4 +9,4 @@ The app will return the current weather, as well as a five-day weather forecast 
 
 This app uses the OpenWeatherMap API: [OpenWeatherMap](https://openweathermap.org)
 
-![OpenWeatherMap]("screenshots/WeatherForecast.png")
+![OpenWeatherMap](screenshots/WeatherForecast.png)
