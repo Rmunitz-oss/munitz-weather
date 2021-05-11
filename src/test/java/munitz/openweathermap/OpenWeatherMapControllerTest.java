@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -108,16 +109,19 @@ public class OpenWeatherMapControllerTest {
         //given
         givenOpenWeatherMapController();
         doReturn(hourlyForecast).when(forecast).getForecastFor(1);
-        doReturn("Wed May 12 11:00:00 EDT 2021").when(hourlyForecast.getDate());
-        doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(hourlyForecast.weather.get(0).getIconUrl());
+        Date date = new Date();
+        //doReturn("Wed May 12 11:00:00 EDT 2021").when(hourlyForecast).getDate();
+        doReturn(date).when(hourlyForecast).getDate();
+        doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(hourlyForecast.weather.get(0)).getIconUrl();
 
         //when
         controller.onOpenWeatherMapForecast(forecast);
 
         //verify
-        verify(dateTextsArray).get(0).setText("Wed May 12");
-        verify(tempTextsArray).get(0).setText("90.0\u00B0");
-        verify(weatherIconsArray).get(0).setImage(any(Image.class));
+        //verify(dateTextsArray).get(0).setText("Wed May 12");
+        verify(dateTextsArray.get(0)).setText(anyString());
+        verify(tempTextsArray.get(0)).setText("90.0\u00B0");
+        verify(weatherIconsArray.get(0)).setImage(any(Image.class));
 
     }
 
