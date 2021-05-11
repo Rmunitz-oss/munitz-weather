@@ -1,4 +1,4 @@
-# munitz-weather
+# Mini Weather Application
 ## Overview
 
 This is a mini weather forecasting app.

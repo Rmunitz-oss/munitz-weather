@@ -24,15 +24,14 @@ public class OpenWeatherMapControllerTest {
     private OpenWeatherMapServiceFactory factory;
     private OpenWeatherMapService service;
     private TextField locationTextField;
-    private OpenWeatherMapFeed feed;
     private Text currentWeatherText;
-    private ImageView weatherIcon;
-    private ArrayList<Text> dateTextsArray, tempTextsArray;
-   // private ArrayList<Text> tempTextsArray;
-    private ArrayList<ImageView> weatherIconsArray;
-    private HourlyForecast hourlyForecast;
     private Label currentWeatherLabel;
+    private OpenWeatherMapFeed feed;
+    private ImageView weatherIcon;
     private OpenWeatherMapForecast forecast;
+    private HourlyForecast hourlyForecast;
+    private List<Text> dateTextsArray, tempTextsArray;
+    private List<ImageView> weatherIconsArray;
 
     @BeforeClass
     public static void beforeClass() {
@@ -83,8 +82,7 @@ public class OpenWeatherMapControllerTest {
         controller.getWeather();
 
         //then
-        //verify(controller).getParameters(); //controller is not a mock. how to verify getParameters() is called?
-        verify(currentWeatherLabel).setText("Current Weather in Tel Aviv: ");
+        verify(currentWeatherLabel).setText("Current Weather: ");
         verify(service).getCurrentWeather("Tel Aviv", "imperial");
         verify(service).getWeatherForecast("Tel Aviv", "imperial");
     }
@@ -102,41 +100,22 @@ public class OpenWeatherMapControllerTest {
         //then
         verify(currentWeatherText).setText("90.0\u00B0");
         verify(weatherIcon).setImage(any(Image.class));
-        //any image?
-        //Image("http://openweathermap.org/img/wn/01n@2x.png"));
 
     }
 
-    @Test
-    //how to test?
-    public void cleanDate(){
-        //given
-        givenOpenWeatherMapController();
-        String [] splitDay = any(String[].class);
-        //doReturn(anyString()).when(controller.cleanDate(hourlyForecast));
-
-        //when
-        controller.cleanDate(hourlyForecast);
-
-        //then
-        verify(String.valueOf(hourlyForecast.getDate()).split(""));
-    }
-    
     @Test
     public void onOpenWeatherMapForecast(){
         //given
         givenOpenWeatherMapController();
         doReturn(hourlyForecast).when(forecast).getForecastFor(1);
-        //doReturn("May 4 ").when(controller.cleanDate(hourlyForecast));
-        //doReturn("90").when(hourlyForecast.main.temp);
-        //doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(hourlyForecast.weather.get(0).getIconUrl());
-
+        doReturn("Wed May 12 11:00:00 EDT 2021").when(hourlyForecast.getDate());
+        doReturn("http://openweathermap.org/img/wn/01n@2x.png").when(hourlyForecast.weather.get(0).getIconUrl());
 
         //when
         controller.onOpenWeatherMapForecast(forecast);
 
         //verify
-        verify(dateTextsArray).get(0).setText("May 4");
+        verify(dateTextsArray).get(0).setText("Wed May 12");
         verify(tempTextsArray).get(0).setText("90.0\u00B0");
         verify(weatherIconsArray).get(0).setImage(any(Image.class));
 
@@ -146,14 +125,10 @@ public class OpenWeatherMapControllerTest {
     public void onError(){
     }
 
-
-
     @Test
-    //redo
     public void givenOpenWeatherMapController() {
         service = mock(OpenWeatherMapService.class);
         controller = new OpenWeatherMapController(service);
-
         factory = mock(OpenWeatherMapServiceFactory.class);
         controller.factory = factory;
         degreeUnitChoiceBox = mock(ChoiceBox.class);
@@ -166,20 +141,22 @@ public class OpenWeatherMapControllerTest {
         controller.currentWeatherText = currentWeatherText;
         weatherIcon = mock(ImageView.class);
         controller.weatherIcon = weatherIcon;
-        dateTextsArray = mock(ArrayList.class);
+        dateTextsArray = Arrays.asList(
+                mock(Text.class));
         controller.dateTextsArray = dateTextsArray;
-        tempTextsArray = mock(ArrayList.class);
+        tempTextsArray = Arrays.asList(mock(Text.class));
         controller.tempTextsArray = tempTextsArray;
-        weatherIconsArray = mock(ArrayList.class);
+        weatherIconsArray = Arrays.asList(mock(ImageView.class));
         controller.weatherIconsArray = weatherIconsArray;
-        forecast = mock(OpenWeatherMapForecast.class);
-        hourlyForecast = mock(HourlyForecast.class);
         feed = mock(OpenWeatherMapFeed.class);
         feed.main = mock(OpenWeatherMapFeed.Main.class);
         feed.main.temp = 90.0;
-        //hourlyForecast.main.temp= 90.0;
+        feed.weather = Arrays.asList(mock(OpenWeatherMapFeed.Weather.class));
+        forecast = mock(OpenWeatherMapForecast.class);
+        hourlyForecast = mock(HourlyForecast.class);
         hourlyForecast.weather = Arrays.asList(
                mock(OpenWeatherMapForecast.HourlyForecast.Weather.class));
-
+        hourlyForecast.main = mock(OpenWeatherMapForecast.HourlyForecast.Main.class);
+        hourlyForecast.main.temp= 90.0;
     }
 }

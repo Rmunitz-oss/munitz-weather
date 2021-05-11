@@ -10,12 +10,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import munitz.openweathermap.OpenWeatherMapForecast.HourlyForecast;
 import java.util.ArrayList;
-
+import java.util.List;
 
 
 public class OpenWeatherMapController {
-    @FXML
-    Label locationLabel;
     @FXML
     TextField locationTextField;
     @FXML
@@ -27,15 +25,14 @@ public class OpenWeatherMapController {
     @FXML
     ImageView weatherIcon;
     @FXML
-    ArrayList<Text> dateTextsArray;
+    List<Text> dateTextsArray;
     @FXML
-    ArrayList<Text> tempTextsArray;
+    List<Text> tempTextsArray;
     @FXML
-    ArrayList<ImageView>weatherIconsArray;
+    List<ImageView>weatherIconsArray;
 
     String location;
     String unit;
-    String iconURL;
     OpenWeatherMapServiceFactory factory;
     OpenWeatherMapService service;
 
@@ -43,25 +40,35 @@ public class OpenWeatherMapController {
         this.service = service;
     }
 
-
+    /**
+     * initializes app
+     * sets default degree unit to Fahrenheit
+     */
     @FXML
     public void initialize(){
         factory = new OpenWeatherMapServiceFactory();
         service = factory.newInstance();
         degreeUnitChoiceBox.setItems(FXCollections.observableArrayList("Celsius", "Fahrenheit"));
-        //default to Fahrenheit
         degreeUnitChoiceBox.setValue("Fahrenheit");
-
     }
 
+    /**
+     * gets location and degree unit
+     * from user input
+     */
     public void getParameters(){
         location = locationTextField.getText();
         unit = (degreeUnitChoiceBox.getValue().equals("Fahrenheit"))? "imperial" : "metric";
     }
 
+    /**
+     * calls getParameter method
+     * and getCurrentWeather and getWeatherForecast
+     *
+     */
     public void getWeather(){
         getParameters();
-        currentWeatherLabel.setText("Current Weather in " + location + ": ");
+        currentWeatherLabel.setText("Current Weather: ");
         Disposable disposableFeed = service.getCurrentWeather(location,unit)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.trampoline())
@@ -72,20 +79,35 @@ public class OpenWeatherMapController {
                 .subscribe(this :: onOpenWeatherMapForecast, this :: onError);
     }
 
+    /**
+     * gets current weather and weather icon
+     * @param feed
+     */
     public void onOpenWeatherMapFeed(OpenWeatherMapFeed feed){
         currentWeatherText.setText((feed.main.temp) +"\u00B0");
         weatherIcon.setImage(new Image(feed.weather.get(0).getIconUrl()));
     }
 
-    public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast){
-        for (int day = 1; day < 6; day++){
-            HourlyForecast hourlyForecast = forecast.getForecastFor(day);
-            dateTextsArray.get(day -1).setText(cleanDate(hourlyForecast));
-            tempTextsArray.get(day -1).setText((hourlyForecast.main.temp) + "\u00B0");
-            weatherIconsArray.get(day-1).setImage(new Image(hourlyForecast.weather.get(0).getIconUrl()));
+    /**
+     * gets and sets date,weather forecast,and weather icon
+     * for the next five days
+     * @param forecast
+     */
+    public void onOpenWeatherMapForecast(OpenWeatherMapForecast forecast){// fix size of array
+        for (int day = 0; day < dateTextsArray.size(); day++){
+            HourlyForecast hourlyForecast = forecast.getForecastFor(day+1);
+            dateTextsArray.get(day).setText(cleanDate(hourlyForecast));
+            tempTextsArray.get(day).setText((hourlyForecast.main.temp) + "\u00B0");
+            weatherIconsArray.get(day).setImage(new Image(hourlyForecast.weather.get(0).getIconUrl()));
         }
     }
 
+    /**
+     * cleans full date from HourlyForecast object
+     * and returns day of the week and date
+     * @param hourlyForecast
+     * @return string date
+     */
     public String cleanDate(HourlyForecast hourlyForecast){
         String[] splitDay = String.valueOf(hourlyForecast.getDate()).split(" ");
         String cleanDate = splitDay[0] + " "
@@ -96,8 +118,6 @@ public class OpenWeatherMapController {
 
 
     public void onError(Throwable throwable){
-
-        //throwable.getStackTrace();
         System.out.println("Error");
     }
 }
